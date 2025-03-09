@@ -5,10 +5,10 @@ def main():
     cmcc = CMCC()
     print(cmcc)
     try:
-        a = cmcc.login("20243143ccut", "279686")
+        a = cmcc.login("", "")
     except CMCC.TooManyClientsError as e:
         print("Force login ing")
-        a = cmcc.login("20243143ccut", "279686", True)
+        a = cmcc.login("", "", True)
     except CMCC.AlreadyLoggedIn as e:
         print("Already logged in")
 
