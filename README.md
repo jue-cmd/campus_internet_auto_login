@@ -1,2 +1,0 @@
-# campus_internet_auto_login
-长春工业大学校园网自动登录
