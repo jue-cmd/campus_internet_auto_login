@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="icos">
+    <file>小猫.png</file>
+  </qresource>
+</RCC>
