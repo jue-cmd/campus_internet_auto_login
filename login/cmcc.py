@@ -1,5 +1,5 @@
 import requests
-from internrtBase import InterNetLogin
+from internrtBase import *
 
 
 class CMCC(InterNetLogin):
@@ -14,6 +14,7 @@ class CMCC(InterNetLogin):
     def down(wlan_ac_ip, wlan_user_ip)-> bool:
         # 目标 URL
         url = "http://111.26.29.113:7119/portalLogout.wlan?44444&isCloseWindow=N"
+
         # 请求头
         headers = {
             "Host": "111.26.29.113:7119",
@@ -26,7 +27,7 @@ class CMCC(InterNetLogin):
             "Connection": "keep-alive"
         }
 
-        # 请求体（表单数据）
+        # 请求体
         data = {
             "wlanAcName": "",
             "wlanAcIp": wlan_ac_ip,
@@ -41,11 +42,7 @@ class CMCC(InterNetLogin):
             "cookies": "",
             "isLocalUser": "",
         }
-
-        # 发送 POST 请求
         response = requests.post(url, headers=headers, data=data)
-
-        # 输出响应
         if response.status_code != 200:
             raise Exception("net error")
         if "下线成功" in response.text:
@@ -94,15 +91,15 @@ class CMCC(InterNetLogin):
             return False
         if response.status_code == 200:
             if "登录认证失败，用户名或密码错误" in response.text:
-                raise CMCC.WrongUsernameOrPassword(username, password)
+                raise WrongUsernameOrPassword(username, password)
             elif "您好，您当前登录的用户已在线，是否继续操作？" in response.text:
-                raise CMCC.TooManyClientsError(response.text)
+                raise TooManyClientsError(response.text)
             return True
         return False
 
     # get ac info
     @staticmethod
-    def get_ac_and_your_ip() -> dict | bool:
+    def get_ac_and_your_ip() -> dict:
         header = {
             "Upgrade-Insecure-Requests": "1"
         }
@@ -120,19 +117,25 @@ class CMCC(InterNetLogin):
                         "login_url":data.split("?")[0]
                     }
                 except:
-                    raise CMCC.FailedGetAcIp(data)
-        if responses.status_code == 200:
-            if "OK" in responses.text:
-                return True
-        return False
-
+                    raise FailedGetAcIp(data)
+        return{}
     def login(self, username, password, force=False)->bool|dict:
         ip = self.get_ac_and_your_ip()
         if type(ip) == dict:
             ret = self.up(ip["ac_ip"], ip["your_ip"], username, password, force)
             if ret:
-                self.login_info = ip
-                return self.login_info
+                self.login_session = ip
+                return self.login_session
         else:
-            raise CMCC.AlreadyLoggedIn(username, password)
+            raise AlreadyLoggedIn(username, password)
         return False
+
+    def logout(self)->bool:
+        if self.login_session is None:
+            raise NotLoggedIn()
+        self.down(self.login_session["ac_ip"], self.login_session["your_ip"])
+        if self.check_internet_connection() is False:
+            self.login_session = None
+            return True
+        else:
+            return False
