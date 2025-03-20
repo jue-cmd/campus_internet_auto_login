@@ -1,4 +1,4 @@
-import json
+from login.config import get_config
 from GuiResource.InfoPop import MessagePopup
 
 class GuiLogics():
@@ -6,21 +6,7 @@ class GuiLogics():
         self.close()
 
     def createJson(self):
-        self.confs={
-            'user':'',
-            'pwd':'',
-            'type':'',
-            'autostart':False
-        }
-        self.confs['user']=self.userLine.text()
-        self.confs['pwd']=self.pwdLine.text()
-        if not self.judgeType():
-            return False
-        if self.autoStart.isChecked():
-            self.confs['autostart']=True
-        self.json=json.dumps(self.confs)
-        with open("login/confs.json", "w") as f:
-            json.dump(self.json, f)
+
         self.pop = MessagePopup("配置完成!!")
         self.pop.show()
 
