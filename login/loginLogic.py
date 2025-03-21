@@ -8,3 +8,4 @@ def login(imp: internrtBase.InterNetLogin, config: dict) -> bool | internrtBase.
 
 def logout(imp: internrtBase.InterNetLogin, config: dict) -> bool | internrtBase.InterNetLogin:
 	return imp.logout()
+

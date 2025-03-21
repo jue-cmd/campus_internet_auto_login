@@ -4,14 +4,14 @@ import defaultConfig
 
 class Config:
     config: dict = None
-
-    def __init__(self) -> None:
+    def __init__(self,config_name="config.json") -> None:
         self.path = os.path.dirname(os.path.abspath(__file__))
         try:
-            self.config: dict = json.load(open(os.path.join(self.path, "config.json")))
+            self.config: dict = json.load(open(os.path.join(self.path, config_name)))
         except FileNotFoundError:
             # generate Default Config
             self.config: dict = defaultConfig.defaultConfig
+            self.save()
 
     def get(self, key: str) -> str | None:
         if hasattr(self.config, key):
@@ -28,15 +28,3 @@ class Config:
     def save(self):
         with open(self.path + "/config.json", "w") as f:
             json.dump(self.config, f, indent=4)
-
-
-def boostrap() -> Config:
-    if not hasattr(Config, "__inst"):
-        Config.__inst = Config()
-    return Config.__inst
-
-
-def get_config() -> Config:
-    if hasattr(Config, "__inst"):
-        return Config.__inst
-    return boostrap()
